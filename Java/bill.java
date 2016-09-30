@@ -1,0 +1,279 @@
+import java.awt.*;
+import java.awt.event.*;
+import java.sql.*;
+import java.io.*;
+import java.util.*;
+import java.util.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+class Bill implements ActionListener
+{
+DBConnect d;
+Statement s;
+Frame bf;
+Label lb1,lb2,lb3,lb4,lb5,l3,l4;
+TextField tf1,tf2,tf3,tf4;
+Dialog d1,d2;
+Button bb,bb1,bb2,bb3,bb4,bb5,bb6,b4;
+TextArea tab,t;
+Panel p1,p2,p3,p;
+int total;
+String qn;
+Date date=new Date();
+MenuBar mb;
+MenuItem m1,m2,m3;
+Menu m;
+Bill()
+{
+d=new DBConnect();
+p1=new Panel();
+p2=new Panel();
+p3=new Panel();
+d1=new Dialog(bf);
+d2=new Dialog(bf);
+bf=new Frame("Bill : Jaikit Jilka");
+lb1=new Label("Bill No");
+lb2=new Label("Date");
+lb3=new Label("Item no");
+lb4=new Label("Qty");
+lb5=new Label("Saved");
+tf1=new TextField(10);
+tf2=new TextField(10);
+tf3=new TextField(10);
+tf4=new TextField(10);
+bb=new Button("Mrp");
+bb2=new Button("Add");
+bb1=new Button("Logout");
+bb3=new Button("Save");
+bb4=new Button("New");
+bb5=new Button("Total");
+bb6=new Button("ok");
+tab=new TextArea();
+t=new TextArea();
+b4=new Button("OK");
+l3=new Label(" SUPER MARKET BILLING SYSTEM");
+l4=new Label("PROJECT BY JAIKIT JILKA");
+d1=new Dialog(bf);
+mb=new MenuBar();
+m=new Menu("File");
+m1=new MenuItem("About");
+m2=new MenuItem("Exit");
+m3=new MenuItem("Help");
+d1.setTitle("About");
+p=new Panel();
+m1.addActionListener(this);
+m2.addActionListener(this);
+m3.addActionListener(this);
+b4.addActionListener(this);
+p.add(l3);
+p.add(l4);
+p.add(b4);
+d2.add(p);
+m.add(m1);
+m.add(m3);
+m.add(m2);
+mb.add(m);
+bf.setMenuBar(mb);
+d2.setSize(500,100);
+d2.setLocation(450,400);
+bf.setLayout(new FlowLayout());
+bb.addActionListener(this);
+bb1.addActionListener(this);
+bb2.addActionListener(this);
+bb3.addActionListener(this);
+bb4.addActionListener(this);
+bb5.addActionListener(this);
+bb6.addActionListener(this);
+p1.add(lb1);
+p1.add(tf1);
+p1.add(lb2);
+p1.add(tf2);
+p1.add(lb3);
+p1.add(tf3);
+p1.add(lb4);
+p1.add(tf4);
+p2.add(bb2);
+//p2.add(bb);
+p2.add(bb5);
+p2.add(bb3);
+p2.add(bb4);
+p2.add(bb1);
+p3.add(lb5);
+p3.add(bb6);
+bf.add(p1);
+bf.add(t);
+bf.add(p2);
+d1.add(p3);
+d1.setVisible(false);
+bf.setVisible(true);
+bf.setSize(800,500);
+bf.setLocation(350,350);
+d1.setLocation(450,450);
+d1.setSize(200,90);
+d1.setTitle("Saved");
+String date = java.text.DateFormat.getDateTimeInstance().format(Calendar.getInstance().getTime());
+tf2.setText(date);
+tf2.setEnabled(false);
+
+}
+public void actionPerformed(ActionEvent e)
+{
+if (e.getSource()==bb)
+{
+}
+else if(e.getSource()==bb2)
+{
+String y2=tf4.getText();
+String id=tf3.getText();
+try
+{
+ResultSet rs1=d.s.executeQuery("select Quantity from product WHERE ID='"+id+"'");
+if(rs1.next())
+{
+qn=rs1.getString(1);
+}}
+catch(Exception z1)
+{
+z1.printStackTrace();
+}
+try
+{
+int qn1 = Integer.parseInt(qn);
+int qn2 = Integer.parseInt(y2);
+int qn3=qn1-qn2;
+d.s.executeUpdate("Update product set Quantity='"+qn3+"' where ID='"+id+"'");
+}
+catch(Exception z1)
+{
+z1.printStackTrace();
+}
+try
+{
+String n=tf3.getText();
+ResultSet rs=d.s.executeQuery("select product1 from product WHERE ID='"+n+"'");
+if(rs.next())
+{
+String a=rs.getString(1);
+t.setEnabled(false);
+t.append(a+"                                   ");
+}}
+catch(Exception g)
+{
+g.printStackTrace();
+}
+String q=tf3.getText();
+try
+{
+ResultSet rs=d.s.executeQuery("select product2 from product WHERE ID='"+q+"'");
+if(rs.next())
+{
+String qty=tf4.getText();
+int n1 = Integer.parseInt(qty);
+String b=rs.getString(1);
+int n2 = Integer.parseInt(b);
+int c=n2*n1;
+t.setEnabled(false);
+t.append(b+"*"+qty+"       "+c+"\n");
+tf3.setText("");
+tf4.setText("");
+total=total+c;
+}}
+catch(Exception z)
+{
+z.printStackTrace();
+}
+}
+else if(e.getSource()==bb1)
+{
+new BillingLogin();
+bf.dispose();
+}
+else if(e.getSource()==bb3)
+{
+d1.setVisible(true);
+bb1.setEnabled(false);
+bb2.setEnabled(false);
+bb3.setEnabled(false);
+bb4.setEnabled(false);
+bb5.setEnabled(false);
+String a=new String();
+String file1=new String();
+BufferedWriter bufferedWriter = null;
+a=tf1.getText();
+file1=t.getText();
+try 
+{
+bufferedWriter = new BufferedWriter(new FileWriter("C:\\bills\\" +a+ ".jai"));
+bufferedWriter.write(file1);
+bufferedWriter.newLine();
+}
+catch (FileNotFoundException ex)
+{
+ex.printStackTrace();
+} 
+catch (IOException ex) 
+{
+ex.printStackTrace();
+}
+finally
+{
+try 
+{
+ if (bufferedWriter != null) 
+ {
+ bufferedWriter.flush();
+ bufferedWriter.close();
+ }
+} 
+catch (IOException ex) 
+{
+}}
+}
+else if(e.getSource()==bb4)
+{
+
+total=0;
+t.setText("");
+}
+else if(e.getSource()==bb5)
+{
+String s1 = Integer.toString(total);
+t.append("\n"+"                           Total  ="+s1+"    Bill No:"+tf1.getText()+"     Date:"+tf2.getText());
+
+t.setEnabled(false);
+}
+else if(e.getSource()==bb6)
+{
+d1.setVisible(false);
+bb1.setEnabled(true);
+bb2.setEnabled(true);
+bb3.setEnabled(true);
+bb4.setEnabled(true);
+bb5.setEnabled(true);
+}
+else if(e.getSource()==m1)
+{
+d2.setVisible(true);
+}
+else if(e.getSource()==m2)
+{
+bf.dispose();
+}
+else if(e.getSource()==m3)
+{
+try
+{
+Runtime.getRuntime().exec("C:/Program Files/Internet Explorer/iexplore.exe"+" file:///D:/project/help.html");
+}
+catch(IOException z)
+{}
+}
+else if(e.getSource()==b4)
+{
+d2.setVisible(false);
+}
+} 
+public static void main(String []args)
+{
+new Bill();
+}}

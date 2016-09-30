@@ -1,0 +1,25 @@
+import java.sql.*;
+import java.awt.*;
+public class DBConnect
+{
+Statement s;
+Connection c;
+DBConnect()
+{
+try
+{
+DriverManager.registerDriver(new sun.jdbc.odbc.JdbcOdbcDriver());
+c=DriverManager.getConnection("jdbc:odbc:project");
+s=c.createStatement();
+System.out.println("connected");
+}
+catch(Exception e)
+{
+e.printStackTrace();
+}
+System.out.println("Done");
+}
+public static void main(String []args)
+{
+new DBConnect();
+}}
